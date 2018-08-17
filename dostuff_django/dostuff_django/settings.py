@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'dostuff',
         'USER': 'dostuffadmin',
         'PASSWORD': 'funky-ducks',
-        'HOST': 'localhost'
+        'HOST': 'ec2-107-22-169-45.compute-1.amazonaws.com'
     }
 }
 
