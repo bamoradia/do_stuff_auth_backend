@@ -31,21 +31,21 @@ class UserEvent(models.Model):
   eventid = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='users')
 
   def __str__(self):
-    return self.name
+    return '{}, {}'.format(self.userid, self.eventid)
 
 class UserCategory(models.Model):
   userid = models.ForeignKey(User, on_delete=models.CASCADE, related_name="categories")
   categoryid = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="users")
 
   def __str__(self):
-    return self.name
+    return '{}, {}'.format(self.userid, self.categoryid)
 
 class EventCategory(models.Model):
   eventid = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='categories')
   categoryid = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='events')
 
   def __str__(self):
-    return self.name
+    return '{}, {}'.format(self.eventid, self.categoryid)
 
 
 
