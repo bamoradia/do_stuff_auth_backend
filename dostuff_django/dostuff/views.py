@@ -14,5 +14,6 @@ class EventList(generics.ListCreateAPIView):
 class EventDetail(generics.RetrieveUpdateDestroyAPIView):
 	queryset = Event.objects.all()
 	serializer_class = EventSerializer
+	
 
 
