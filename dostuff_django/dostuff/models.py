@@ -8,7 +8,7 @@ class User(models.Model):
   location = models.CharField(max_length=64)
 
   def __str__(self):
-    return self.name
+    return self.username
 
 class Event(models.Model):
   name = models.CharField(max_length=100)
@@ -25,3 +25,33 @@ class Category(models.Model):
 
   def __str__(self):
     return self.name
+
+class UserEvent(models.Model):
+  userid = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
+  eventid = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='users')
+
+  def __str__(self):
+    return self.name
+
+class UserCategory(models.Model):
+  userid = models.ForeignKey(User, on_delete=models.CASCADE, related_name="categories")
+  categoryid = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="users")
+
+  def __str__(self):
+    return self.name
+
+class EventCategory(models.Model):
+  eventid = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='categories')
+  categoryid = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='events')
+
+  def __str__(self):
+    return self.name
+
+
+
+
+
+
+
+
+
