@@ -75,20 +75,20 @@ WSGI_APPLICATION = 'dostuff_django.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'dostuff',
-#         'USER': 'dostuffadmin',
-#         'PASSWORD': 'funky-ducks',
-#         'HOST': 'ec2-107-22-169-45.compute-1.amazonaws.com'
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'postgres://vtknhqtbciimbu:7a1be0bea5c51689426b48470f06e671fd1ad3ad4a7493eadf899bafaf1c1b15@ec2-107-22-
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dostuff',
+        'USER': 'dostuffadmin',
+        'PASSWORD': 'funky-ducks',
+        'HOST': 'localhost'
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'postgres://vtknhqtbciimbu:7a1be0bea5c51689426b48470f06e671fd1ad3ad4a7493eadf899bafaf1c1b15@ec2-107-22-
+#     }
+# }
 
 
 # Password validation
