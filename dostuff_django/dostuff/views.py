@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import User, Event, Category, UserEvent, UserCategory, EventCategory
+from django.contrib.auth.models import User
 
 from rest_framework import generics
 from .serializers import EventSerializer
