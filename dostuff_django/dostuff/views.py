@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.models import User
-from .models import Event, Category, UserEvent, UserCategory, EventCategory
+from .models import Event, Category, UserEvent, UserCategory, EventCategory, UserProfile
 from rest_framework import generics
 from .serializers import EventSerializer
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-import json
+# import json
+
+
 
 # Create your views here.
 
@@ -60,13 +62,19 @@ def user_delete_event(request):
 def create_user(request):
 	if request.method == 'POST':
 
-		user = User.objects.create(username='freddie')
-		user.set_password('iHateCoding')
+		user = User.objects.create(username=request.POST['username'])
+		user.set_password(request.POST['password'])
 
 		user.save()
+
+		user_profile = UserProfile(user=user, location=request.POST['location'])
+		user_profile.save()
 		
 
 		return JsonResponse({'status': 'added user'})
+
+
+
 
 
 @csrf_exempt
