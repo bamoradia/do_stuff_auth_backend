@@ -103,10 +103,10 @@ def edit_user(request):
 
 
 @csrf_exempt
-def dekete_user(request):
+def delete_user(request):
 	if request.method == 'DELETE':
 		# request.POST['userid']
-		user_match = User.objects.get(pk=7)
+		user_match = User.objects.get(pk=8)
 		user_match.delete()	
 
 		return JsonResponse({'status': 'deleted user'})
