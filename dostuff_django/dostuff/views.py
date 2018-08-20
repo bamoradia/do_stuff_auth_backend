@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.contrib.auth.models import User
 from .models import Event, Category, UserEvent, UserCategory, EventCategory, UserProfile
 from rest_framework import generics
@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 import requests
 import time
 import datetime
-# import json
+import json
 
 
 
@@ -73,8 +73,6 @@ def events_list(request):
 	# response.json()
 	# response_json = serializers.serialize('json', response)
 
-	print(response_json['events'][0], 'this is the reponse')
-
 	# events = Event.objects.all()
 	# serializer_class = EventSerializer
 	return JsonResponse(events_serialized, safe=False)
@@ -129,24 +127,28 @@ def create_user(request):
 def edit_user(request):
 	if request.method == 'PUT':
 		# request.POST['userid']
-		user_match = User.objects.get(pk=8)
+		request_dict = QueryDict(request.body).dict()
+
+		user_match = User.objects.get(pk=request_dict['userid'])
 		user_profile = UserProfile.objects.get(user=user_match)
-		# print(user_profile.location, 'this is user profile location')
-		print(request.POST, 'this is the request location')
 
-		# user_profile.location = request.POST['location']
-		# user_profile.save()
+		user_profile.location = request_dict['location']
+		user_profile.save()
 
-		# categories = UserCategory.objects.filter(userid=request.POST['userid'])
+		categories = UserCategory.objects.filter(userid=request_dict['userid'])
 
-		# categories.delete()
+		categories.delete()
 
-		# for i in range(0, len(request.POST['category'])):
-		# 	category_model = Category.objects.get(name=request.POST['category'][i])
-		# 	user_category = UserCategory(userid=user_match, categoryid = category_model)
-		# 	user_category.save()
+		print(request_dict['category'])
+		cat_list = eval(request_dict['category'])
 
-		
+		for i in range(0, len(cat_list)):
+			print(cat_list[i], 'this is the category')
+			category_model = Category.objects.get(name=cat_list[i])
+			user_category = UserCategory(userid=user_match, categoryid = category_model)
+			user_category.save()
+
+
 
 		return JsonResponse({'status': 'updated user'})
 
@@ -154,8 +156,9 @@ def edit_user(request):
 @csrf_exempt
 def delete_user(request):
 	if request.method == 'DELETE':
-		# request.POST['userid']
-		user_match = User.objects.get(pk=8)
+
+		request_dict = QueryDict(request.body).dict()
+		user_match = User.objects.get(pk=request_dict['userid'])
 		user_match.delete()	
 
 		return JsonResponse({'status': 'deleted user'})
@@ -174,5 +177,18 @@ def testing(request):
 		return JsonResponse({'status': 'added user'})
 
 
+@csrf_exempt 
+# Just used to initially load categories into database
+def populate_categories(request):
+	categories=['music', 'food-and-drink', 'other', 'performing-arts', 'charities', 'festivals-fairs', 'sports-active-life', 'nightlife', 'visual-arts', 'kids-family', 'fashion', 'film', 'lectures-books']
+
+	database_categories = Category.objects.all()
+	database_categories.delete()
+
+	for i in range(0, len(categories)):
+		c = Category(name=categories[i])
+		c.save()
+
+	return JsonResponse({'status': 'Created Categories'})
 
 
