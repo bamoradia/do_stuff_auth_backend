@@ -7,7 +7,6 @@ from .serializers import EventSerializer
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-import json
 
 # Create your views here.
 
