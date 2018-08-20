@@ -11,6 +11,8 @@ import requests
 import time
 import datetime
 import json
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -23,7 +25,33 @@ import json
 # class EventDetail(generics.RetrieveUpdateDestroyAPIView):
 # 	queryset = Event.objects.all()
 # 	serializer_class = EventSerializer
+@csrf_exempt
+def not_logged_in(request):
+	return JsonResponse({'status': 400, 'data': 'User not authenitcated'})
+
+
+@csrf_exempt
+def log_user_in(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+    	# print(request, user)
+    	login(request, user)
+    	return JsonResponse({'status': 200, 'data': 'LOGGED IN'})
+    else:
+    	return JsonResponse({'status': 400, 'data': 'Did not Log in'})
+
+
+
+@csrf_exempt
+@login_required
+def logout_view(request):
+    logout(request)
+    return JsonResponse({'status': 200, 'data': 'Logged Out'})
 	
+
+
 # SEND BACK ALL EVENTS IF NOT LOGGED IN AND ALL CATEGORIES
 # SEND BACK USER EVENTS AND CATEGORIES IF LOGGED IN
 def events_list(request):
@@ -33,7 +61,10 @@ def events_list(request):
 	# Need to find user's location for intial event search
 	# Need to update date so it only pulls event from today onwards
 
-	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=50&start_date=1534611850", headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
+	current_time = int(time.time())
+	next_week = current_time + 604800
+
+	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=50&start_date={}&end_date={}".format(current_time, next_week), headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
 
 	response_json = response.json()
 
@@ -85,6 +116,7 @@ def events_list(request):
 
 # NO DATA NEEDED IN RESPONSE
 @csrf_exempt
+@login_required
 def user_add_event(request):
 	if request.method == 'POST':
 		event = Event.objects.get(pk=request.POST['eventid']) # change 1 to variable that holds userid --> sent in request
@@ -101,6 +133,7 @@ def user_add_event(request):
 
 # NO DATA NEEDED IN RESPONSE
 @csrf_exempt
+@login_required(redirect_field_name='not_logged_in')
 def user_delete_event(request):
 	if request.method == 'DELETE':
 		event = Event.objects.get(pk=request.POST['eventid'])
@@ -136,6 +169,7 @@ def create_user(request):
 
 # UPDATED LIST OF ALL USER CATEGORY EVENTS
 @csrf_exempt
+@login_required(login_url='/api/authentication-error')
 def edit_user(request):
 	if request.method == 'PUT':
 		# request.POST['userid']
@@ -189,6 +223,7 @@ def edit_user(request):
 
 # REMOVE LOGGED IN TRUE
 @csrf_exempt
+@login_required
 def delete_user(request):
 	if request.method == 'DELETE':
 
