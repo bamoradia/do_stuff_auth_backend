@@ -27,8 +27,7 @@ import datetime
 
 def events_list(request):
 	events = Event.objects.all()
-	#do this after we final database grab of all events
-	events_serialized = serializers.serialize('json', events)
+	categories = Category.objects.all()
 
 	# Need to find user's location for intial event search
 
@@ -38,26 +37,38 @@ def events_list(request):
 
 	in_database = False
 
-	for i in range(0, length(response_json['events'])):
-		for j in range(0, length(events)):
-			if events[j]['url'] == response_json['event_site_url']:
+	for i in range(0, len(response_json['events'])):
+		for j in range(0, len(events)):
+			if events[j].url == response_json['events'][i]['event_site_url']:
 				in_database = True
 
 		if in_database == False:
 			#add event to database
-			date, time = response_json['time_start'].split(' ')
-			year, month, day = date.split('-')
+			date_str, time_str = response_json['events'][i]['time_start'].split(' ')
+			year, month, day = date_str.split('-')
 
-			s = '{}/{}/{}'.fomat(day, month, year)
+			s = '{}/{}/{}'.format(day, month, year)
 
 			unix_time = time.mktime(datetime.datetime.strptime(s, "%d/%m/%Y").timetuple())
 
-			e = Event(name=response_json['name'], date=unix_time, time=time, description=response_json['description'], url=response_json['event_site_url'])
+			e = Event(name=response_json['events'][i]['name'], date=unix_time, time=time_str, description=response_json['events'][i]['description'], url=response_json['events'][i]['event_site_url'])
 
-			events.append(e)
+			e.save()
+
+			category_index = -1
+
+			for k in range(0, len(categories)):
+				if(categories[k].name == response_json['events'][i]['category']):
+					ec = EventCategory(eventid=e, categoryid=categories[k])
+					ec.save()
+
+
+
+			# also need to find category and search database for category match then add to eventcategory table
 			in_database = False
 
-
+	new_event_list = Event.objects.all()
+	events_serialized = serializers.serialize('json', new_event_list)
 	
 	# response.json()
 	# response_json = serializers.serialize('json', response)
