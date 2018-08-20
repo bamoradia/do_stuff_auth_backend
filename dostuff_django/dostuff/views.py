@@ -44,10 +44,12 @@ def log_user_in(request):
 
 
 @csrf_exempt
-@login_required
 def logout_view(request):
-    logout(request)
-    return JsonResponse({'status': 200, 'data': 'Logged Out'})
+	if request.user.is_authenticated:
+	    logout(request)
+	    return JsonResponse({'status': 200, 'data': 'Logged Out'})
+	else: 
+		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
 	
 
 
@@ -115,9 +117,8 @@ def events_list(request):
 
 # NO DATA NEEDED IN RESPONSE
 @csrf_exempt
-@login_required
 def user_add_event(request):
-	if request.method == 'POST':
+	if request.method == 'POST' and request.user.is_authenticated:
 		event = Event.objects.get(pk=request.POST['eventid']) # change 1 to variable that holds userid --> sent in request
 		# event_serialized = serializers.serialize('json', [event, ])
 
@@ -127,14 +128,15 @@ def user_add_event(request):
 		user_event.save()
 
 		return JsonResponse({'status': 'Added Event to User'})
+	else: 
+		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
 
 
 
 # NO DATA NEEDED IN RESPONSE
 @csrf_exempt
-@login_required(redirect_field_name='not_logged_in')
 def user_delete_event(request):
-	if request.method == 'DELETE':
+	if request.method == 'DELETE' and request.user.is_authenticated:
 		event = Event.objects.get(pk=request.POST['eventid'])
 
 		user = User.objects.get(pk=request.POST['userid'])
@@ -144,6 +146,8 @@ def user_delete_event(request):
 		user_event.delete()
 
 		return JsonResponse({'status': 'Removed Event from User'})
+	else: 
+		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
 
 
 
@@ -168,9 +172,8 @@ def create_user(request):
 
 # UPDATED LIST OF ALL USER CATEGORY EVENTS
 @csrf_exempt
-@login_required(login_url='/api/authentication-error')
 def edit_user(request):
-	if request.method == 'PUT':
+	if request.method == 'PUT' and request.user.is_authenticated:
 		# request.POST['userid']
 		request_dict = QueryDict(request.body).dict()
 
@@ -217,20 +220,24 @@ def edit_user(request):
 
 		return JsonResponse({'status': 200, 'data': events_serialized})
 
+	else: 
+		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
+
 
 
 
 # REMOVE LOGGED IN TRUE
 @csrf_exempt
-@login_required
 def delete_user(request):
-	if request.method == 'DELETE':
+	if request.method == 'DELETE' and request.user.is_authenticated:
 
 		request_dict = QueryDict(request.body).dict()
 		user_match = User.objects.get(pk=request_dict['userid'])
 		user_match.delete()	
 
 		return JsonResponse({'status': 'deleted user'})
+	else: 
+		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
 
 
 
