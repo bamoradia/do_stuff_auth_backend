@@ -24,12 +24,14 @@ import json
 # 	queryset = Event.objects.all()
 # 	serializer_class = EventSerializer
 	
-
+# SEND BACK ALL EVENTS IF NOT LOGGED IN AND ALL CATEGORIES
+# SEND BACK USER EVENTS AND CATEGORIES IF LOGGED IN
 def events_list(request):
 	events = Event.objects.all()
 	categories = Category.objects.all()
 
 	# Need to find user's location for intial event search
+	# Need to update date so it only pulls event from today onwards
 
 	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=50&start_date=1534611850", headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
 
@@ -55,8 +57,6 @@ def events_list(request):
 
 			e.save()
 
-			category_index = -1
-
 			for k in range(0, len(categories)):
 				if(categories[k].name == response_json['events'][i]['category']):
 					ec = EventCategory(eventid=e, categoryid=categories[k])
@@ -69,14 +69,21 @@ def events_list(request):
 
 	new_event_list = Event.objects.all()
 	events_serialized = serializers.serialize('json', new_event_list)
+
+	category_list = Category.objects.all()
+	categories_serialized = serializers.serialize('json', category_list)
 	
 	# response.json()
 	# response_json = serializers.serialize('json', response)
 
 	# events = Event.objects.all()
 	# serializer_class = EventSerializer
-	return JsonResponse(events_serialized, safe=False)
+	return JsonResponse({'status': 200, 'data': {'events': events_serialized, 'categories': categories_serialized}})
 
+
+
+
+# NO DATA NEEDED IN RESPONSE
 @csrf_exempt
 def user_add_event(request):
 	if request.method == 'POST':
@@ -90,6 +97,9 @@ def user_add_event(request):
 
 		return JsonResponse({'status': 'Added Event to User'})
 
+
+
+# NO DATA NEEDED IN RESPONSE
 @csrf_exempt
 def user_delete_event(request):
 	if request.method == 'DELETE':
@@ -105,10 +115,11 @@ def user_delete_event(request):
 
 
 
+
+# USERID AND LOGGED IN TRUE 
 @csrf_exempt
 def create_user(request):
 	if request.method == 'POST':
-
 		user = User.objects.create(username=request.POST['username'])
 		user.set_password(request.POST['password'])
 
@@ -116,13 +127,14 @@ def create_user(request):
 
 		user_profile = UserProfile(user=user, location=request.POST['location'])
 		user_profile.save()
-		
 
-		return JsonResponse({'status': 'added user'})
-
+		return JsonResponse({'status': 200, 'userid': user.id})
 
 
 
+
+
+# UPDATED LIST OF ALL USER CATEGORY EVENTS
 @csrf_exempt
 def edit_user(request):
 	if request.method == 'PUT':
@@ -139,20 +151,43 @@ def edit_user(request):
 
 		categories.delete()
 
-		print(request_dict['category'])
 		cat_list = eval(request_dict['category'])
 
+		user_events = []
+
 		for i in range(0, len(cat_list)):
-			print(cat_list[i], 'this is the category')
 			category_model = Category.objects.get(name=cat_list[i])
 			user_category = UserCategory(userid=user_match, categoryid = category_model)
 			user_category.save()
 
 
+		user_cats = UserCategory.objects.filter(userid=request_dict['userid'])
 
-		return JsonResponse({'status': 'updated user'})
+		for i in range(0, len(user_cats)):
+			cat_events = EventCategory.objects.filter(categoryid=user_cats[i].categoryid)
+			user_events.extend(cat_events)
+
+		events = []
+
+		for i in range(0, len(user_events)):
+			print(user_events[i].eventid,'this the user event')
+			# found_event = Event.objects.get(id=user_events[i].eventid)
+			events.append(user_events[i].eventid)
 
 
+
+
+		events_serialized = serializers.serialize('json', events)
+		#FIND ALL CATEGORIES ASSOCIATED WITH USER
+		#FIND ALL EVENTS ASSOCIATED WITH THOSE CATEGORIES
+
+
+		return JsonResponse({'status': 200, 'data': events_serialized})
+
+
+
+
+# REMOVE LOGGED IN TRUE
 @csrf_exempt
 def delete_user(request):
 	if request.method == 'DELETE':
@@ -166,17 +201,7 @@ def delete_user(request):
 
 
 
-@csrf_exempt
-def testing(request):
-	if request.method == 'POST':
-
-		# body_unicode = request.body.decode('utf-8')
-		
-		print(request.POST['test'], 'this is the request.body')		
-
-		return JsonResponse({'status': 'added user'})
-
-
+# CONFIRMATON THAT CATEGORIES WERE ADDED
 @csrf_exempt 
 # Just used to initially load categories into database
 def populate_categories(request):
