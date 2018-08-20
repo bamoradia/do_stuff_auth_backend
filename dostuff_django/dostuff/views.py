@@ -252,3 +252,11 @@ def populate_categories(request):
 	return JsonResponse({'status': 'Created Categories'})
 
 
+@csrf_exempt 
+def testing(request):
+	print(request.user.is_authenticated)
+
+
+	return JsonResponse({'status': 200})
+
+

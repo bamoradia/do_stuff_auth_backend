@@ -12,7 +12,8 @@ path('api/deleteuser', views.delete_user, name='delete_user'),
 path('api/dostuff-categories-need-added', views.populate_categories, name='populate_categories'),
 path('api/login', views.log_user_in, name='login'),
 path('api/logout', views.logout_view, name='logout'),
-path('api/authentication-error', views.not_logged_in, name='not_logged_in')
+path('api/authentication-error', views.not_logged_in, name='not_logged_in'),
+path('api/testing', views.testing, name='testing'),
   # path('api/event/', views.EventList.as_view(), name='event-list'),
   # path('api/event/<int:pk>', views.EventDetail.as_view(), name='event-detail'),
 ]
