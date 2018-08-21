@@ -43,8 +43,8 @@ def log_user_in(request):
 	user = authenticate(request, username=username, password=password)
 	if user is not None:
 		login(request, user)
-    	
-		return JsonResponse({'status': 200, 'data': 'LOGGED IN'})
+		user_match = User.objects.get(username=username)
+		return JsonResponse({'status': 200, 'userid': user_match.id})
 	else:
 		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
 
