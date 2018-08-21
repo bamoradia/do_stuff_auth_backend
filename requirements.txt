@@ -1,5 +1,6 @@
 certifi==2018.8.13
 Django==2.1
+django-cors-headers==2.4.0
 djangorestframework==3.8.2
 pipenv==2018.7.1
 psycopg2==2.7.5
