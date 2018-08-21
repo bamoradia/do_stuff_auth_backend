@@ -156,12 +156,20 @@ def user_delete_event(request):
 @csrf_exempt
 def create_user(request):
 	if request.method == 'POST':
-		user = User.objects.create(username=request.POST['username'])
-		user.set_password(request.POST['password'])
+		print("\n")
+		print("request.body is here")
+		it = json.loads(request.body)
+		print(it['username'])
+		print(it['password'])
+		print(it['confirm'])
+		print(it['location'])
+
+		user = User.objects.create(username=it['username'])
+		user.set_password(it['password'])
 
 		user.save()
 
-		user_profile = UserProfile(user=user, location=request.POST['location'])
+		user_profile = UserProfile(user=user, location=it['location'])
 		user_profile.save()
 
 		return JsonResponse({'status': 200, 'userid': user.id})
