@@ -24,6 +24,7 @@ from django.contrib.auth.decorators import login_required
 # class EventDetail(generics.RetrieveUpdateDestroyAPIView):
 # 	queryset = Event.objects.all()
 # 	serializer_class = EventSerializer
+
 @csrf_exempt
 def not_logged_in(request):
 	return JsonResponse({'status': 400, 'data': 'User not authenitcated'})
@@ -31,15 +32,21 @@ def not_logged_in(request):
 
 @csrf_exempt
 def log_user_in(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-    	# print(request, user)
-    	login(request, user)
-    	return JsonResponse({'status': 200, 'data': 'LOGGED IN'})
-    else:
-    	return JsonResponse({'status': 400, 'data': 'Did not Log in'})
+
+
+	parsedData = json.loads(request.body)
+
+
+	username = parsedData['username']
+	password = parsedData['password']
+
+	user = authenticate(request, username=username, password=password)
+	if user is not None:
+		login(request, user)
+    	
+		return JsonResponse({'status': 200, 'data': 'LOGGED IN'})
+	else:
+		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
 
 
 
@@ -166,20 +173,15 @@ def user_delete_event(request):
 @csrf_exempt
 def create_user(request):
 	if request.method == 'POST':
-		print("\n")
-		print("request.body is here")
-		it = json.loads(request.body)
-		print(it['username'])
-		print(it['password'])
-		print(it['confirm'])
-		print(it['location'])
 
-		user = User.objects.create(username=it['username'])
-		user.set_password(it['password'])
+		parsedData = json.loads(request.body)
+
+		user = User.objects.create(username=parsedData['username'])
+		user.set_password(parsedData['password'])
 
 		user.save()
 
-		user_profile = UserProfile(user=user, location=it['location'])
+		user_profile = UserProfile(user=user, location=parsedData['location'])
 		user_profile.save()
 
 		return JsonResponse({'status': 200, 'userid': user.id})
