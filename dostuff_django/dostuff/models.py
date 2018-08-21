@@ -13,9 +13,14 @@ class UserProfile(models.Model):
 class Event(models.Model):
   name = models.TextField()
   date = models.IntegerField()
-  time = models.CharField(max_length=32)
+  time = models.CharField(max_length=64)
   description = models.TextField()
   url = models.TextField()
+  category = models.CharField(max_length=128, default="other")
+  image_url = models.TextField(default="#")
+  address = models.CharField(max_length=128, default="444 N Wabash St")
+  city = models.CharField(max_length=128, default="Chicago")
+  state = models.CharField(max_length=128, default="IL")
 
   def __str__(self):
     return self.name

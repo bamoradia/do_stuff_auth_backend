@@ -85,7 +85,17 @@ def events_list(request):
 
 			unix_time = time.mktime(datetime.datetime.strptime(s, "%d/%m/%Y").timetuple())
 
-			e = Event(name=response_json['events'][i]['name'], date=unix_time, time=time_str, description=response_json['events'][i]['description'], url=response_json['events'][i]['event_site_url'])
+			e = Event(
+				name=response_json['events'][i]['name'], 
+				date=unix_time, time=time_str, 
+				description=response_json['events'][i]['description'], 
+				url=response_json['events'][i]['event_site_url'], 
+				category=response_json['events'][i]['category'],
+				image_url=response_json['events'][i]['image_url'],
+				address=response_json['events'][i]['location']['address1'],
+				city=response_json['events'][i]['location']['city'],
+				state=response_json['events'][i]['location']['state']
+			)
 
 			e.save()
 
