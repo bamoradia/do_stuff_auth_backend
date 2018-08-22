@@ -44,7 +44,9 @@ def log_user_in(request):
 	if user is not None:
 		login(request, user)
 		user_match = User.objects.get(username=username)
-		return JsonResponse({'status': 200, 'userid': user_match.id})
+		user_categories = UserCategory.objects.filter(userid=user)
+		user_categories_JSON = serializers.serialize('json', user_categories)
+		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON })
 	else:
 		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
 
@@ -193,9 +195,11 @@ def create_user(request):
 # UPDATED LIST OF ALL USER CATEGORY EVENTS
 @csrf_exempt
 def edit_user(request):
+
 	if request.method == 'PUT' and request.user.is_authenticated:
 		# request.POST['userid']
-		request_dict = QueryDict(request.body).dict()
+		request_dict = json.loads(request.body)
+		# request_dict = QueryDict(request.body).dict()
 
 		user_match = User.objects.get(pk=request_dict['userid'])
 		user_profile = UserProfile.objects.get(user=user_match)
@@ -207,7 +211,8 @@ def edit_user(request):
 
 		categories.delete()
 
-		cat_list = eval(request_dict['category'])
+		# cat_list = eval(request_dict['categories'])
+		cat_list = request_dict['categories']
 
 		user_events = []
 
@@ -280,7 +285,7 @@ def populate_categories(request):
 
 @csrf_exempt 
 def testing(request):
-	print(request.user.is_authenticated)
+	print(request.user)
 
 
 	return JsonResponse({'status': 200})
