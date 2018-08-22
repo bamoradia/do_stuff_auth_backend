@@ -15,16 +15,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 
-# Create your views here.
-
-# class EventList(generics.ListCreateAPIView):
-# 	queryset = Event.objects.all()
-# 	serializer_class = EventSerializer
-
-# class EventDetail(generics.RetrieveUpdateDestroyAPIView):
-# 	queryset = Event.objects.all()
-# 	serializer_class = EventSerializer
-
 @csrf_exempt
 def not_logged_in(request):
 	return JsonResponse({'status': 400, 'data': 'User not authenitcated'})
@@ -47,9 +37,6 @@ def log_user_in(request):
 		user_categories = UserCategory.objects.filter(userid=user)
 		categories = []
 		for i in range(0, len(user_categories)):
-			print('--------------')
-			print(user_categories[i].categoryid)
-			print('--------------')
 			# cat = Category.objects.get(pk=user_categories[i].categoryid)
 			categories.append(user_categories[i].categoryid)
 		user_categories_JSON = serializers.serialize('json', categories)
@@ -238,7 +225,6 @@ def edit_user(request):
 		events = []
 
 		for i in range(0, len(user_events)):
-			print(user_events[i].eventid,'this the user event')
 			# found_event = Event.objects.get(id=user_events[i].eventid)
 			events.append(user_events[i].eventid)
 
