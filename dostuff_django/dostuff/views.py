@@ -45,7 +45,14 @@ def log_user_in(request):
 		login(request, user)
 		user_match = User.objects.get(username=username)
 		user_categories = UserCategory.objects.filter(userid=user)
-		user_categories_JSON = serializers.serialize('json', user_categories)
+		categories = []
+		for i in range(0, len(user_categories)):
+			print('--------------')
+			print(user_categories[i].categoryid)
+			print('--------------')
+			# cat = Category.objects.get(pk=user_categories[i].categoryid)
+			categories.append(user_categories[i].categoryid)
+		user_categories_JSON = serializers.serialize('json', categories)
 		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON })
 	else:
 		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
