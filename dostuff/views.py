@@ -201,7 +201,7 @@ def edit_user(request):
 		user_profile.location = request_dict['location']
 		user_profile.save()
 
-		categories = UserCategory.objects.filter(userid=request_dict['userid'])
+		categories = UserCategory.objects.(userid=request_dict['userid'])
 
 		categories.delete()
 
