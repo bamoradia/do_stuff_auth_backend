@@ -1,1 +1,2 @@
-web: python dostuff_django/manage.py runserver
+release: python manage.py migrate
+web: gunicorn dostuff_django.wsgi --log-file -
