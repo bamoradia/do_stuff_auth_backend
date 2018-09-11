@@ -24,7 +24,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 SECRET_KEY = 'a=368sc&k*@aoxjef)ry4v0kek5k0$40)_8+3&9+u&1%vzshel'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['https://ancient-springs-75165.herokuapp.com/', '127.0.0.1:8000', 'https://do-stuf.herokuapp.com', 'localhost', 'do-stuf.herokuapp.com', 'ancient-springs-75165.herokuapp.com']
 
