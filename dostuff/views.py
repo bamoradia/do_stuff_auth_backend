@@ -208,6 +208,7 @@ def edit_user(request):
 		# cat_list = eval(request_dict['categories'])
 		cat_list = request_dict['categories']
 
+		print(cat_list)
 		user_events = []
 
 		for i in range(0, len(cat_list)):
