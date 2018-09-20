@@ -172,15 +172,21 @@ def create_user(request):
 
 		parsedData = json.loads(request.body)
 
-		user = User.objects.create(username=parsedData['username'])
-		user.set_password(parsedData['password'])
+		# Search if username is already in database
+		userExists = User.objects.filter(username=parsedData['username']).exists()
 
-		user.save()
+		if userExists: 
+			return JsonResponse({'status': 403, 'message': 'Username already exists'})
+		else: 
+			user = User.objects.create(username=parsedData['username'])
+			user.set_password(parsedData['password'])
 
-		user_profile = UserProfile(user=user, location=parsedData['location'])
-		user_profile.save()
+			user.save()
 
-		return JsonResponse({'status': 200, 'userid': user.id})
+			user_profile = UserProfile(user=user, location=parsedData['location'])
+			user_profile.save()
+
+			return JsonResponse({'status': 200, 'userid': user.id})
 
 
 
