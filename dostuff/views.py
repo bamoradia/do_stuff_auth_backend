@@ -132,7 +132,7 @@ def events_list(request):
 @csrf_exempt
 def user_add_event(request):
 	if request.method == 'POST' and request.user.is_authenticated:
-		event = Event.objects.get(pk=request.POST['eventid']) # change 1 to variable that holds userid --> sent in request
+		event = Event.objects.get(url=request.POST['eventURL']) # change 1 to variable that holds userid --> sent in request
 		# event_serialized = serializers.serialize('json', [event, ])
 
 		user = User.objects.get(pk=request.POST['userid']) # change 1 to variable that holds userid --> sent in request
@@ -158,7 +158,7 @@ def user_delete_event(request):
 
 		user_event.delete()
 
-		return JsonResponse({'status': 'Removed Event from User'})
+		return JsonResponse({'status': 200, 'data': 'Removed Event from User'})
 	else: 
 		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
 
@@ -287,6 +287,6 @@ def testing(request):
 	print(request.user)
 
 
-	return JsonResponse({'status': 200})
+	return JsonResponse({'status': 200, 'data': request.user})
 
 
