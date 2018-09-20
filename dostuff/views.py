@@ -285,7 +285,7 @@ def populate_categories(request):
 @csrf_exempt 
 def testing(request):
 
-	if request,user.is_authenticated:
+	if request.user.is_authenticated:
 		print(request.user)
 		return JsonResponse({'status': 200, 'data': request.user})
 	else: 
