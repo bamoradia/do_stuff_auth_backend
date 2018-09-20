@@ -289,6 +289,6 @@ def testing(request):
 		print(request.user)
 		return JsonResponse({'status': 200, 'data': request.user})
 	else: 
-		return JsonResponse('status': 400, 'data': 'user was not logged in')
+		return JsonResponse({'status': 400, 'data': 'user was not logged in'})
 
 
