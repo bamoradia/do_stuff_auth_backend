@@ -7,7 +7,7 @@ import secrets
 class UserProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   location = models.CharField(max_length=64)
-  key = models.CharField(max_length=64, default=secrets.token_hex(55))
+  key = models.TextField(default=secrets.token_hex(55))
 
   def __str__(self):
     return self.user.username

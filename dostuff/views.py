@@ -26,8 +26,7 @@ def log_user_in(request):
 
 
 	parsedData = json.loads(request.body)
-
-
+	
 	username = parsedData['username']
 	password = parsedData['password']
 
@@ -47,6 +46,7 @@ def log_user_in(request):
 		user_categories_JSON = serializers.serialize('json', categories)
 		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON, 'key': key})
 	else:
+		print('sending does not exist')
 		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
 
 
@@ -182,17 +182,18 @@ def create_user(request):
 
 		if userExists: 
 			return JsonResponse({'status': 403, 'message': 'Username already exists'})
-		else: 
+		else:
+			key = secrets.token_hex(55) 
 			user = User.objects.create(username=parsedData['username'])
 			user.set_password(parsedData['password'])
 
 			user.save()
 
-			user_profile = UserProfile(user=user, location=parsedData['location'])
+			user_profile = UserProfile(user=user, location=parsedData['location'], key=key)
 			user_profile.save()
 
 
-			return JsonResponse({'status': 200, 'userid': user.id})
+			return JsonResponse({'status': 200, 'userid': user.id, 'key': key })
 
 
 
