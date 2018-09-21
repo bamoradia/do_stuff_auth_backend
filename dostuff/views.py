@@ -13,6 +13,7 @@ import datetime
 import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+import secrets
 
 
 @csrf_exempt
@@ -33,7 +34,7 @@ def log_user_in(request):
 	user = authenticate(request, username=username, password=password)
 	if user is not None:
 		login(request, user)
-		key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=55))
+		key = secrets.token_hex(55)
 		user_match = User.objects.get(username=username)
 		user_profile = UserProfile.objects.get(user=user_match)
 		user_profile = UserProfile(key=key)
