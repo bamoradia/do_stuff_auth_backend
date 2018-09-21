@@ -37,7 +37,7 @@ def log_user_in(request):
 		key = secrets.token_hex(55)
 		user_match = User.objects.get(username=username)
 		user_profile = UserProfile.objects.get(user=user_match)
-		user_profile = UserProfile(key=key)
+		user_profile.key = key
 		user_profile.save()
 		user_categories = UserCategory.objects.filter(userid=user)
 		categories = []
@@ -201,55 +201,61 @@ def create_user(request):
 # UPDATED LIST OF ALL USER CATEGORY EVENTS
 @csrf_exempt
 def edit_user(request):
-
-	if request.method == 'PUT' and request.user.is_authenticated:
-		# request.POST['userid']
+	if request.method == 'PUT':
 		request_dict = json.loads(request.body)
-		# request_dict = QueryDict(request.body).dict()
+		#check if user exists with given user ID
+		userExists = User.objects.filter(pk=request_dict['userid']).exists()
+		#if user exists, then find the user and user profile
+		if userExists:
+			user_match = User.objects.get(pk=request_dict['userid'])
+			user_profile = UserProfile.objects.get(user=user_match)
+			#check if key matches user key
+			if user_profile.key == request_dict['key']:
 
-		user_match = User.objects.get(pk=request_dict['userid'])
-		user_profile = UserProfile.objects.get(user=user_match)
+				user_profile.location = request_dict['location']
+				user_profile.save()
 
-		user_profile.location = request_dict['location']
-		user_profile.save()
+				categories_check = UserCategory.objects.filter(userid=user_match).exists()
 
-		categories = UserCategory.objects.get(userid=request_dict['userid'])
+				if categories_check: 
+					categories = UserCategory.objects.get(userid=user_match)
+					categories.delete()
 
-		categories.delete()
+				# cat_list = eval(request_dict['categories'])
+				cat_list = request_dict['categories']
+				print(cat_list, 'this is the categories list from React')
 
-		# cat_list = eval(request_dict['categories'])
-		cat_list = request_dict['categories']
+				user_events = []
 
-		user_events = []
-
-		for i in range(0, len(cat_list)):
-			category_model = Category.objects.get(name=cat_list[i])
-			user_category = UserCategory(userid=user_match, categoryid = category_model)
-			user_category.save()
-
-
-		user_cats = UserCategory.objects.filter(userid=request_dict['userid'])
-
-		for i in range(0, len(user_cats)):
-			cat_events = EventCategory.objects.filter(categoryid=user_cats[i].categoryid)
-			user_events.extend(cat_events)
-
-		events = []
-
-		for i in range(0, len(user_events)):
-			# found_event = Event.objects.get(id=user_events[i].eventid)
-			events.append(user_events[i].eventid)
+				for i in range(0, len(cat_list)):
+					category_model = Category.objects.get(name=cat_list[i])
+					user_category = UserCategory(userid=user_match, categoryid = category_model)
+					print(user_category, 'THIS IS USER CATEGORY')
+					user_category.save()
 
 
+				user_cats = UserCategory.objects.filter(userid=request_dict['userid'])
+
+				for i in range(0, len(user_cats)):
+					cat_events = EventCategory.objects.filter(categoryid=user_cats[i].categoryid)
+					user_events.extend(cat_events)
+
+				events = []
+
+				for i in range(0, len(user_events)):
+					# found_event = Event.objects.get(id=user_events[i].eventid)
+					events.append(user_events[i].eventid)
+
+				events_serialized = serializers.serialize('json', events)
+				#FIND ALL CATEGORIES ASSOCIATED WITH USER
+				#FIND ALL EVENTS ASSOCIATED WITH THOSE CATEGORIES
 
 
-		events_serialized = serializers.serialize('json', events)
-		#FIND ALL CATEGORIES ASSOCIATED WITH USER
-		#FIND ALL EVENTS ASSOCIATED WITH THOSE CATEGORIES
-
-
-		return JsonResponse({'status': 200, 'data': events_serialized})
-
+				return JsonResponse({'status': 200, 'data': events_serialized})
+			else: 
+				return JsonResponse({'status': 400, 'data': 'User not authenticated'})
+		else: 
+			return JsonResponse({'status': 400, 'data': 'User not authenticated'})
 	else: 
 		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
 
