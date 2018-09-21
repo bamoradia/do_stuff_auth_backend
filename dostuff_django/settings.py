@@ -14,8 +14,9 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -89,26 +90,26 @@ WSGI_APPLICATION = 'dostuff_django.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'dostuff',
-#         'USER': 'dostuffadmin',
-#         'PASSWORD': 'funky-ducks',
-#         'HOST': 'localhost'
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'deofs2svc02ou4',
-        'USER': 'ltheljxsyzxsrd',
-        'PASSWORD': '7f24e9b60f12955ad1969e5284ed2f2755cadf7aba4bab763c745c4a7e82dd32',
-        'HOST': 'ec2-54-163-245-44.compute-1.amazonaws.com',
-        'PORT': 5432
+        'NAME': 'dostuff',
+        'USER': 'dostuffadmin',
+        'PASSWORD': 'funky-ducks',
+        'HOST': 'localhost'
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'deofs2svc02ou4',
+#         'USER': 'ltheljxsyzxsrd',
+#         'PASSWORD': '7f24e9b60f12955ad1969e5284ed2f2755cadf7aba4bab763c745c4a7e82dd32',
+#         'HOST': 'ec2-54-163-245-44.compute-1.amazonaws.com',
+#         'PORT': 5432
+#     }
+# }
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'postgres://vtknhqtbciimbu:7a1be0bea5c51689426b48470f06e671fd1ad3ad4a7493eadf899bafaf1c1b15@ec2-107-22-
