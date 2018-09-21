@@ -1,13 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-import random, string
+import secrets
 
 # Create your models here.
 
 class UserProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   location = models.CharField(max_length=64)
-  key = models.CharField(max_length=64, default=''.join(random.choices(string.ascii_uppercase + string.digits, k=55)))
+  key = models.CharField(max_length=64, default=secrets.token_hex(55))
 
   def __str__(self):
     return self.user.username
