@@ -26,7 +26,7 @@ def log_user_in(request):
 
 
 	parsedData = json.loads(request.body)
-	
+
 	username = parsedData['username']
 	password = parsedData['password']
 
@@ -189,7 +189,7 @@ def create_user(request):
 
 			user.save()
 
-			user_profile = UserProfile(user=user, location=parsedData['location'], key=key)
+			user_profile = UserProfile.objects.create(user=user, location=parsedData['location'], key=key)
 			user_profile.save()
 
 
