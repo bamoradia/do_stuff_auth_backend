@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   location = models.CharField(max_length=64)
+  key = models.CharField(max_length=64, default=''.join(random.choices(string.ascii_uppercase + string.digits, k=55)))
 
   def __str__(self):
     return self.user.username

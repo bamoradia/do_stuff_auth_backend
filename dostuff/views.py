@@ -33,14 +33,18 @@ def log_user_in(request):
 	user = authenticate(request, username=username, password=password)
 	if user is not None:
 		login(request, user)
+		key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=55))
 		user_match = User.objects.get(username=username)
+		user_profile = UserProfile.objects.get(user=user_match)
+		user_profile = UserProfile(key=key)
+		user_profile.save()
 		user_categories = UserCategory.objects.filter(userid=user)
 		categories = []
 		for i in range(0, len(user_categories)):
 			# cat = Category.objects.get(pk=user_categories[i].categoryid)
 			categories.append(user_categories[i].categoryid)
 		user_categories_JSON = serializers.serialize('json', categories)
-		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON })
+		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON, 'key': key})
 	else:
 		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
 
@@ -185,6 +189,7 @@ def create_user(request):
 
 			user_profile = UserProfile(user=user, location=parsedData['location'])
 			user_profile.save()
+
 
 			return JsonResponse({'status': 200, 'userid': user.id})
 
