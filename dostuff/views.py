@@ -53,8 +53,17 @@ def log_user_in(request):
 
 @csrf_exempt
 def logout_view(request):
-	if request.user.is_authenticated:
+	parsedData = json.loads(request.body)
+	#check if user exists in database
+	user_check = User.objects.filter(pk=parsedData['userid'])
+	if user_check: 
+		user_match = User.objects.get(pk=parsedData['userid'])
+		user_profile = UserProfile.objects.get(user=user_match)
+	#if user exists, key matches and user is authenticated, logout user
+	if request.user.is_authenticated and user_check and parsedData['key'] == user_profile.key :
 	    logout(request)
+	    user_profile.key = secrets.token_hex(55)
+	    user_profile.save()
 	    return JsonResponse({'status': 200, 'data': 'Logged Out'})
 	else: 
 		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
