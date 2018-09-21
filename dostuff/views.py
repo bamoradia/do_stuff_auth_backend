@@ -45,7 +45,7 @@ def log_user_in(request):
 			# cat = Category.objects.get(pk=user_categories[i].categoryid)
 			categories.append(user_categories[i].categoryid)
 		user_categories_JSON = serializers.serialize('json', categories)
-		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON, 'key': key})
+		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON, 'key': key, 'location': user_profile.location})
 	else:
 		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
 
@@ -218,7 +218,7 @@ def edit_user(request):
 				categories_check = UserCategory.objects.filter(userid=user_match).exists()
 
 				if categories_check: 
-					categories = UserCategory.objects.get(userid=user_match)
+					categories = UserCategory.objects.filter(userid=user_match)
 					categories.delete()
 
 				# cat_list = eval(request_dict['categories'])
