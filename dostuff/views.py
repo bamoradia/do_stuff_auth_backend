@@ -25,27 +25,40 @@ def not_logged_in(request):
 def log_user_in(request):
 
 
-	parsedData = json.loads(request.body)
+	parsed_data = json.loads(request.body)
 
 
-	username = parsedData['username']
-	password = parsedData['password']
+	username = parsed_data['username']
+	password = parsed_data['password']
 
 	user = authenticate(request, username=username, password=password)
 	if user is not None:
 		login(request, user)
+		#create a new secret key for this session
 		key = secrets.token_hex(55)
 		user_match = User.objects.get(username=username)
+		#update the user_profile with the new key
 		user_profile = UserProfile.objects.get(user=user_match)
 		user_profile.key = key
 		user_profile.save()
+		#find all categories the user has saved
 		user_categories = UserCategory.objects.filter(userid=user)
 		categories = []
+		#loop over the categories to get in more friendly way
 		for i in range(0, len(user_categories)):
 			# cat = Category.objects.get(pk=user_categories[i].categoryid)
 			categories.append(user_categories[i].categoryid)
 		user_categories_JSON = serializers.serialize('json', categories)
-		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON, 'key': key, 'location': user_profile.location})
+
+		user_events_queryset = UserEvent.objects.filter(userid=user_match)
+
+		user_events = []
+		for i in range(0, len(user_events_queryset)):
+			user_events.append(user_events_queryset[i].eventid)
+
+
+		user_events_serialized = serializers.serialize('json', user_events)
+		return JsonResponse({'status': 200, 'userid': user_match.id, 'categories': user_categories_JSON, 'key': key, 'location': user_profile.location, 'events': user_events_serialized})
 	else:
 		return JsonResponse({'status': 400, 'data': 'Did not Log in'})
 
@@ -53,14 +66,14 @@ def log_user_in(request):
 
 @csrf_exempt
 def logout_view(request):
-	parsedData = json.loads(request.body)
+	parsed_data = json.loads(request.body)
 	#check if user exists in database
-	user_check = User.objects.filter(pk=parsedData['userid'])
+	user_check = User.objects.filter(pk=parsed_data['userid'])
 	if user_check: 
-		user_match = User.objects.get(pk=parsedData['userid'])
+		user_match = User.objects.get(pk=parsed_data['userid'])
 		user_profile = UserProfile.objects.get(user=user_match)
 	#if user exists, key matches and user is authenticated, logout user
-	if request.user.is_authenticated and user_check and parsedData['key'] == user_profile.key :
+	if request.user.is_authenticated and user_check and parsed_data['key'] == user_profile.key :
 	    logout(request)
 	    user_profile.key = secrets.token_hex(55)
 	    user_profile.save()
@@ -145,18 +158,27 @@ def events_list(request):
 # NO DATA NEEDED IN RESPONSE
 @csrf_exempt
 def user_add_event(request):
-	if request.method == 'POST' and request.user.is_authenticated:
-		event = Event.objects.get(url=request.POST['eventURL']) # change 1 to variable that holds userid --> sent in request
+	parsed_data = json.loads(request.body)
+	user_check = User.objects.filter(pk=parsed_data['userid'])
+	if user_check: 
+		user_match = User.objects.get(pk=parsed_data['userid'])
+		user_profile = UserProfile.objects.get(user=user_match)
+
+	if request.method == 'POST' and user_check and user_profile.key == parsed_data['key']:
+		print(parsed_data['event'])
+		event = Event.objects.get(url=parsed_data['event']) # change 1 to variable that holds userid --> sent in request
 		# event_serialized = serializers.serialize('json', [event, ])
 
-		user = User.objects.get(pk=request.POST['userid']) # change 1 to variable that holds userid --> sent in request
+		event_exists = UserEvent(userid=user_match, eventid=event).exists()
+		if event_exists:
+			return JsonResponse({'status': 204, 'data': 'Event already in User DB'})
+		else: 
+			user_event = UserEvent(userid=user_match, eventid=event)
+			user_event.save()
 
-		user_event = UserEvent(userid=user, eventid=event)
-		user_event.save()
-
-		return JsonResponse({'status': 'Added Event to User'})
+			return JsonResponse({'status': 200, 'data': 'Added Event to User'})
 	else: 
-		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
+		return JsonResponse({'status': 401, 'data': 'User not authenticated'})
 
 
 
@@ -184,20 +206,20 @@ def user_delete_event(request):
 def create_user(request):
 	if request.method == 'POST':
 
-		parsedData = json.loads(request.body)
+		parsed_data = json.loads(request.body)
 
 		# Search if username is already in database
-		userExists = User.objects.filter(username=parsedData['username']).exists()
+		userExists = User.objects.filter(username=parsed_data['username']).exists()
 
 		if userExists: 
 			return JsonResponse({'status': 403, 'message': 'Username already exists'})
 		else: 
-			user = User.objects.create(username=parsedData['username'])
-			user.set_password(parsedData['password'])
+			user = User.objects.create(username=parsed_data['username'])
+			user.set_password(parsed_data['password'])
 
 			user.save()
 
-			user_profile = UserProfile(user=user, location=parsedData['location'])
+			user_profile = UserProfile(user=user, location=parsed_data['location'])
 			user_profile.save()
 
 
