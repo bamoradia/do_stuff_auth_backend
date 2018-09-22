@@ -54,7 +54,9 @@ def log_user_in(request):
 
 		user_events = []
 		for i in range(0, len(user_events_queryset)):
-			user_events.append(user_events_queryset[i].eventid)
+
+			if int(time.time()) < user_events_queryset[i].eventid.date:
+				user_events.append(user_events_queryset[i].eventid)
 
 
 		user_events_serialized = serializers.serialize('json', user_events)
@@ -95,9 +97,10 @@ def events_list(request):
 	current_time = int(time.time())
 	next_week = current_time + 604800
 
-	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=50&start_date={}&end_date={}".format(current_time, next_week), headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
+	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=5&start_date={}&end_date={}".format(current_time, next_week), headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
 
 	response_json = response.json()
+	print(response_json)
 
 	in_database = False
 
@@ -169,7 +172,7 @@ def user_add_event(request):
 		event = Event.objects.get(url=parsed_data['event']) # change 1 to variable that holds userid --> sent in request
 		# event_serialized = serializers.serialize('json', [event, ])
 
-		event_exists = UserEvent(userid=user_match, eventid=event).exists()
+		event_exists = UserEvent.objects.filter(userid=user_match, eventid=event).exists()
 		if event_exists:
 			return JsonResponse({'status': 204, 'data': 'Event already in User DB'})
 		else: 
