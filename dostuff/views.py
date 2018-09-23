@@ -197,18 +197,26 @@ def user_add_event(request):
 # NO DATA NEEDED IN RESPONSE
 @csrf_exempt
 def user_delete_event(request):
-	if request.method == 'DELETE' and request.user.is_authenticated:
-		event = Event.objects.get(pk=request.POST['eventid'])
+	parsed_data = json.loads(request.body)
+	user_check = User.objects.filter(pk=parsed_data['userid'])
+	if user_check: 
+		user_match = User.objects.get(pk=parsed_data['userid'])
+		user_profile = UserProfile.objects.get(user=user_match)
 
-		user = User.objects.get(pk=request.POST['userid'])
+	if request.method == 'POST' and user_check and user_profile.key == parsed_data['key']:
+		event = Event.objects.get(url=parsed_data['event']) # change 1 to variable that holds userid --> sent in request
+		# event_serialized = serializers.serialize('json', [event, ])
 
-		user_event = UserEvent.objects.get(userid=request.POST['userid'], eventid=request.POST['eventid'])
+		event_exists = UserEvent.objects.filter(userid=user_match, eventid=event).exists()
+		if not event_exists:
+			return JsonResponse({'status': 204, 'data': 'Event not in user events database'})
+		else: 
+			user_event = UserEvent.objects.get(userid=user_match, eventid=event)
+			user_event.delete()
 
-		user_event.delete()
-
-		return JsonResponse({'status': 200, 'data': 'Removed Event from User'})
+			return JsonResponse({'status': 200, 'data': 'Added Event to User'})
 	else: 
-		return JsonResponse({'status': 400, 'data': 'User not authenticated'})
+		return JsonResponse({'status': 401, 'data': 'User not authenticated'})
 
 
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import secrets
+import time
 
 # Create your models here.
 
@@ -8,6 +9,9 @@ class UserProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   location = models.CharField(max_length=64)
   key = models.TextField(default=secrets.token_hex(55))
+  auth_key = models.CharField(max_length=16, default=secrets.token_hex(6))
+  last_login = models.IntegerField(default=time.time())
+  email = models.CharField(max_length=64, default='')
 
   def __str__(self):
     return self.user.username
