@@ -97,19 +97,21 @@ def events_list(request):
 	current_time = int(time.time())
 	next_week = current_time + 604800
 
-	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=5&start_date={}&end_date={}".format(current_time, next_week), headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
+	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=50&start_date={}".format(current_time), headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
 
 	response_json = response.json()
-	print(response_json)
+	print(len(response_json['events']), 'this is the number of events on yelp')
 
 	in_database = False
 
 	for i in range(0, len(response_json['events'])):
 		for j in range(0, len(events)):
 			if events[j].url == response_json['events'][i]['event_site_url']:
+				print('already in database')
 				in_database = True
 
 		if in_database == False:
+			print('added to database')
 			#add event to database
 			date_str, time_str = response_json['events'][i]['time_start'].split(' ')
 			year, month, day = date_str.split('-')
@@ -140,10 +142,18 @@ def events_list(request):
 
 
 			# also need to find category and search database for category match then add to eventcategory table
-			in_database = False
+		in_database = False
 
 	new_event_list = Event.objects.all()
-	events_serialized = serializers.serialize('json', new_event_list)
+	events_list = []
+	count = 0
+	for i in range(0, len(new_event_list)):
+		if int(time.time()) < new_event_list[i].date:
+				events_list.append(new_event_list[i])
+				count += 1
+
+	print(count)
+	events_serialized = serializers.serialize('json', events_list)
 
 	category_list = Category.objects.all()
 	categories_serialized = serializers.serialize('json', category_list)
@@ -168,7 +178,6 @@ def user_add_event(request):
 		user_profile = UserProfile.objects.get(user=user_match)
 
 	if request.method == 'POST' and user_check and user_profile.key == parsed_data['key']:
-		print(parsed_data['event'])
 		event = Event.objects.get(url=parsed_data['event']) # change 1 to variable that holds userid --> sent in request
 		# event_serialized = serializers.serialize('json', [event, ])
 
