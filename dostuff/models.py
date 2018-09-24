@@ -11,7 +11,7 @@ class UserProfile(models.Model):
   key = models.TextField(default=secrets.token_hex(55))
   auth_key = models.CharField(max_length=16, default=secrets.token_hex(6))
   last_login = models.IntegerField(default=time.time())
-  email = models.CharField(max_length=64, default='')
+  email = models.CharField(max_length=64, default='test')
 
   def __str__(self):
     return self.user.username

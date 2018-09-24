@@ -14,6 +14,15 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import secrets
+from twilio.rest import Client
+import threading
+
+
+# Your Account SID from twilio.com/console
+account_sid = "ACfbf02ec44aa05b5acc501fd124f4ef4c"
+# Your Auth Token from twilio.com/console
+auth_token  = "80c548e33b468c16cbf85258d7815e10"
+client = Client(account_sid, auth_token)
 
 
 @csrf_exempt
@@ -27,7 +36,6 @@ def log_user_in(request):
 
 	parsed_data = json.loads(request.body)
 
-
 	username = parsed_data['username']
 	password = parsed_data['password']
 
@@ -37,9 +45,22 @@ def log_user_in(request):
 		#create a new secret key for this session
 		key = secrets.token_hex(55)
 		user_match = User.objects.get(username=username)
+
+		#if User is Badal, send a text with authenitcation token via sms
+		#using trial account on Twilio -> can only send sms to one number
+		if username == 'TestSMS':
+			auth_token = secrets.token_hex(3)
+
+			message = client.messages.create(
+		    to="+16306870821", 
+		    from_="+16282227315",
+		    body=auth_token)
+
+
 		#update the user_profile with the new key
 		user_profile = UserProfile.objects.get(user=user_match)
 		user_profile.key = key
+		user_profile.last_login = time.time()
 		user_profile.save()
 		#find all categories the user has saved
 		user_categories = UserCategory.objects.filter(userid=user)
@@ -100,18 +121,15 @@ def events_list(request):
 	response = requests.get("https://api.yelp.com/v3/events?location=Chicago&limit=50&start_date={}".format(current_time), headers={'Authorization': 'Bearer gr0amugCLWzgKkSCIgPZnPI8e7cRXFuEprIOGszYzUIo9JH5kWT1LMMZUkIW0tOBpywUrjmxns-zKDh5FoGsj4_SPNZG_-WDeGAzOCESd0wG9ZX5tUOXIRo4H2poW3Yx'})
 
 	response_json = response.json()
-	print(len(response_json['events']), 'this is the number of events on yelp')
 
 	in_database = False
 
 	for i in range(0, len(response_json['events'])):
 		for j in range(0, len(events)):
 			if events[j].url == response_json['events'][i]['event_site_url']:
-				print('already in database')
 				in_database = True
 
 		if in_database == False:
-			print('added to database')
 			#add event to database
 			date_str, time_str = response_json['events'][i]['time_start'].split(' ')
 			year, month, day = date_str.split('-')
@@ -151,8 +169,6 @@ def events_list(request):
 		if int(time.time()) < new_event_list[i].date:
 				events_list.append(new_event_list[i])
 				count += 1
-
-	print(count)
 	events_serialized = serializers.serialize('json', events_list)
 
 	category_list = Category.objects.all()
@@ -353,5 +369,30 @@ def testing(request):
 		return JsonResponse({'status': 200, 'data': request.user})
 	else: 
 		return JsonResponse({'status': 400, 'data': 'user was not logged in'})
+
+
+
+
+test_count = 0
+def set_interval(func, sec):
+    def func_wrapper():
+        set_interval(func, sec) 
+        func()  
+    t = threading.Timer(sec, func_wrapper)
+    t.start()
+    return t
+
+
+def test_function():
+	print('test')
+
+
+
+set_interval(test_function, 540)
+
+
+
+
+
 
 
