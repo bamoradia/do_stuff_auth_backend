@@ -13,9 +13,7 @@ path('api/dostuff-categories-need-added', views.populate_categories, name='popul
 path('api/login', views.log_user_in, name='login'),
 path('api/logout', views.logout_view, name='logout'),
 path('api/authentication-error', views.not_logged_in, name='not_logged_in'),
-path('api/testing', views.testing, name='testing'),
+path('api/auth', views.user_authenticate, name='user_auth'),
   # path('api/event/', views.EventList.as_view(), name='event-list'),
   # path('api/event/<int:pk>', views.EventDetail.as_view(), name='event-detail'),
 ]
-
-## COMBINE URLS WITH LOCALHOST:8000 TO MAKE API CALLS!!!!!!!!!!!!
