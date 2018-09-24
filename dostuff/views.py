@@ -463,7 +463,7 @@ def daily_reminders():
 			user_events = UserEvent.objects.filter(userid = all_users[i])
 			user_descriptions = []
 			for j in range(0, len(user_events)):
-				user_descriptions.append(user_events.eventid.name)
+				user_descriptions.append(user_events[j].eventid.name)
 
 
 			message = client.messages.create(
@@ -478,6 +478,6 @@ def daily_reminders():
 
 set_interval(reset_authentication, 1200)
 
-set_interval(daily_reminders, 10000)
+set_interval(daily_reminders, 1200)
 	
 
