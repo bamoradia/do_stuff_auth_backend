@@ -8,9 +8,9 @@ import time
 class UserProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   location = models.CharField(max_length=64)
-  key = models.TextField(default=secrets.token_hex(55))
-  auth_key = models.CharField(max_length=16, default=secrets.token_hex(6))
-  last_login = models.IntegerField(default=time.time())
+  key = models.TextField(default='afkdjkajskfjaksjdfkajsdkfjaksdfjajfakkj323')
+  auth_key = models.CharField(max_length=16, default='kdsfk23r2k3jr2krj23r29rfskdfjsdf293f29fj')
+  last_login = models.IntegerField(default=0)
   email = models.CharField(max_length=64, default='test')
 
   def __str__(self):
