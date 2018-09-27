@@ -2,11 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse, QueryDict
 from django.contrib.auth.models import User
 from .models import Event, Category, UserEvent, UserCategory, EventCategory, UserProfile
-from rest_framework import generics
 from .serializers import EventSerializer
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User
 import requests
 import time
 import datetime
