@@ -436,45 +436,46 @@ def populate_categories(request):
 	return JsonResponse({'status': 'Created Categories'})
 
 
-test_count = 0
-def set_interval(func, sec):
-    def func_wrapper():
-        set_interval(func, sec) 
-        func()  
-    t = threading.Timer(sec, func_wrapper)
-    t.start()
-    return t
+# test_count = 0
+# def set_interval(func, sec):
+#     def func_wrapper():
+#         set_interval(func, sec) 
+#         func()  
+#     t = threading.Timer(sec, func_wrapper)
+#     t.start()
+#     return t
 
-#used to prevent Heroku server from sleeping 
-def reset_authentication():
-	print(datetime.datetime.now())
-
-
-def daily_reminders():
-	print(datetime.datetime.now())
-	all_users = User.objects.all()
-	#find the user profile associated with each user and look at last login time
-	for i in range(0, len(all_users)): 
-		#only setup for specific user because of limitations of Twilio trial account
-		if all_users[i].username == 'TestSMS':
-			user_events = UserEvent.objects.filter(userid = all_users[i])
-			user_descriptions = []
-			for j in range(0, len(user_events)):
-				user_descriptions.append(user_events[j].eventid.name)
+# #used to prevent Heroku server from sleeping 
+# def reset_authentication():
+# 	print(datetime.datetime.now())
 
 
-			message = client.messages.create(
-		    to="+16306870821", 
-		   	from_="+16282227315",
-		   	body=user_descriptions)
+# def daily_reminders():
+# 	print(datetime.datetime.now())
+# 	print('I am running on the server')
+# 	all_users = User.objects.all()
+# 	#find the user profile associated with each user and look at last login time
+# 	for i in range(0, len(all_users)): 
+# 		#only setup for specific user because of limitations of Twilio trial account
+# 		if all_users[i].username == 'TestSMS':
+# 			user_events = UserEvent.objects.filter(userid = all_users[i])
+# 			user_descriptions = []
+# 			for j in range(0, len(user_events)):
+# 				user_descriptions.append(user_events[j].eventid.name)
 
 
-
+# 			message = client.messages.create(
+# 		    to="+16306870821", 
+# 		   	from_="+16282227315",
+# 		   	body=user_descriptions)
 
 
 
-set_interval(reset_authentication, 1200)
 
-set_interval(daily_reminders, 1200)
+
+
+# set_interval(reset_authentication, 1200)
+
+# set_interval(daily_reminders, 1200)
 	
 
