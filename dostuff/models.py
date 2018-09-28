@@ -9,7 +9,7 @@ class UserProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   location = models.CharField(max_length=64)
   key = models.TextField(default='afkdjkajskfjaksjdfkajsdkfjaksdfjajfakkj323')
-  auth_key = models.CharField(max_length=16, default='kdsfk23r2k3jr2krj23r29rfskdfjsdf293f29fj')
+  auth_key = models.CharField(max_length=16, default='dfjsdf293f29fj')
   last_login = models.IntegerField(default=0)
   email = models.CharField(max_length=64, default='test')
 

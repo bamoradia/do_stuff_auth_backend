@@ -1,8 +1,6 @@
-from django.shortcuts import render
 from django.http import JsonResponse, QueryDict
 from django.contrib.auth.models import User
 from .models import Event, Category, UserEvent, UserCategory, EventCategory, UserProfile
-from .serializers import EventSerializer
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import requests
@@ -10,7 +8,6 @@ import time
 import datetime
 import json
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 import secrets
 from twilio.rest import Client
 import threading
@@ -332,8 +329,8 @@ def create_user(request):
 			user_profile.last_login = time.time()
 			user_profile.save()
 
-
-			return JsonResponse({'status': 200, 'userid': user.id, 'key': user_profile.key})
+			return JsonResponse({'status': 200})
+			# return JsonResponse({'status': 200, 'userid': user.id, 'key': user_profile.key})
 
 
 
