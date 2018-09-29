@@ -329,8 +329,8 @@ def create_user(request):
 			user_profile.last_login = time.time()
 			user_profile.save()
 
-			return JsonResponse({'status': 200})
-			# return JsonResponse({'status': 200, 'userid': user.id, 'key': user_profile.key})
+			# return JsonResponse({'status': 200})
+			return JsonResponse({'status': 200, 'userid': user.id, 'key': user_profile.key})
 
 
 
