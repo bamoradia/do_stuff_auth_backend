@@ -99,16 +99,17 @@ def log_user_in(request):
 			requests.post('https://sms.telnyx.com/messages', 
 				headers={'Content-Type':'application/x-www-form-urlencoded',
 				'x-profile-secret': config['x-profile-secret'],
-				}, data={
+				}, 
+				data={
 				'from': config['from'],
 				'to': config['to'],
-				'body': auth_token
+				'body': '{}, Sent via Telnyx'.format(auth_token)
 				})
 
 			message = client.messages.create(
 		    to="+16306870821", 
 		    from_="++16282227315",
-		    body=auth_token)
+		    body='{}, Sent via Twilio'.format(auth_token))
 			return JsonResponse({'status': 200, 'data': 'Waiting for auth_token authentication'})
 		else:
 			login(request, user)
