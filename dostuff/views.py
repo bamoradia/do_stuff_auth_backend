@@ -11,13 +11,11 @@ from django.contrib.auth import authenticate, login, logout
 import secrets
 from twilio.rest import Client
 import threading
+from config import config
 
 
-# Your Account SID from twilio.com/console
-account_sid = "ACfbf02ec44aa05b5acc501fd124f4ef4c"
-# Your Auth Token from twilio.com/console
-auth_token  = "80c548e33b468c16cbf85258d7815e10"
-client = Client(account_sid, auth_token)
+
+client = Client(config['account_sid'], config['auth_token'])
 
 
 @csrf_exempt
@@ -97,6 +95,15 @@ def log_user_in(request):
 			user_profile = UserProfile.objects.get(user=user_match)
 			user_profile.auth_key = auth_token
 			user_profile.save()
+
+			requests.post('https://sms.telnyx.com/messages', 
+				headers={'Content-Type':'application/x-www-form-urlencoded',
+				'x-profile-secret': config['x-profile-secret'],
+				}, data={
+				'from': config['from'],
+				'to': config['to'],
+				'body': auth_token
+				})
 
 			message = client.messages.create(
 		    to="+16306870821", 
